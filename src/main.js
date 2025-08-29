@@ -1,5 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const runProcess = require("./utils/runprocess.js");
+const clear_routes = require("./utils/clear_routes.js");
+const globals = require("./const.js");
+const path = require("path");
 
 let win;
 
@@ -30,27 +33,36 @@ app.on('activate', () => {
 
 let proc = null;
 
-ipcMain.on("connect", () => {
+ipcMain.on("connect", async () => {
   if (proc !== null) return;
 
-  proc = runProcess("find", ["/"]);
+  try {
+    await clear_routes().done;
 
-  proc.done.then(({code, signal}) => {
-    console.log("process finished, code: ", code, "signal: ", signal);
-  }).catch(err => {
-    console.error("process error: ", err);
-  }).finally(() => {
-    win.webContents.send("connect-proc-finish");
-    proc = null;
-  })
+    const client_bin = path.resolve(__dirname, "../", globals.VPN_BIN_DIR, "client");
 
-  proc.stdout.on("data", d => {
-    win.webContents.send("connect-status", d.toString());
-  })
+    proc = runProcess("sudo", [`RT_NETMASK=${globals.RT_NETMASK}`, `RT_GATEWAY=${globals.RT_GATEWAY}`, `RT_DEV=${globals.RT_DEV}`, client_bin, "-l", globals.IP, "-p", globals.PORT]);
 
-  proc.stderr.on("data", d => {
-    win.webContents.send("connect-status", d.toString());
-  })
+    proc.done.then(({code, signal}) => {
+      console.log("process finished, code: ", code, "signal: ", signal);
+    }).catch(err => {
+      console.error("process error: ", err);
+    }).finally(() => {
+      win.webContents.send("connect-proc-finish");
+      proc = null;
+    })
+
+    proc.stdout.on("data", d => {
+      win.webContents.send("connect-status", d.toString());
+    })
+
+    proc.stderr.on("data", d => {
+      win.webContents.send("connect-status", d.toString());
+    })
+  } catch(err) {
+    console.log("couldnt clear routes", err);
+    win.webContents.send("connect-status", "failed to clear routes!");
+  }
 });
 
 ipcMain.on("disconnect", () => {

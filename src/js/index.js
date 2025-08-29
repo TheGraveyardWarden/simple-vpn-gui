@@ -1,8 +1,14 @@
 window.onload = () => {
   let connect_btn = document.querySelector("#connect-btn");
+  let logs = document.querySelector("#logs");
   let is_connected = false;
 
   connect_btn.addEventListener("click", connect);
+
+  function append_logs(txt) {
+    logs.value += txt;
+    logs.scrollTop = logs.scrollHeight;
+  }
 
   function set_connected(v) {
     is_connected = v;
@@ -27,7 +33,7 @@ window.onload = () => {
   }
 
   window.bridge.onConnect((_, data) => {
-    console.log(data);
+    append_logs(data);
   });
 
   window.bridge.onFinish((_) => {

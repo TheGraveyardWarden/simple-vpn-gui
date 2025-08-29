@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   font-family: "Fira Code", "JetBrains Mono", "Cascadia Code", "Courier New", monospace;
+  color: white;
 }
 
 html {
@@ -37,4 +38,16 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.textfield {
+  resize: none;
+  width: 100%;
+  background: transparent;
+  color: white;
+  border: none;
+}
+
+.textfield:focus {
+  outline: none;
 }
