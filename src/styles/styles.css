@@ -1,0 +1,40 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Fira Code", "JetBrains Mono", "Cascadia Code", "Courier New", monospace;
+}
+
+html {
+  background: #1d1d1d;
+  padding: 3px;
+}
+
+.btn {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+  cursor: pointer;
+  padding: 1px 5px;
+}
+
+.btn:hover {
+  background: white;
+  color: #1d1d1d;
+}
+
+.btn-disconnect {
+  border: 2px solid red;
+  color: red;
+}
+
+.btn-disconnect:hover {
+  background: red;
+}
+
+.center-con {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
