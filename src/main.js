@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const runProcess = require("./utils/runprocess.js");
 
 let win;
 
@@ -27,7 +28,34 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
+let proc = null;
+
 ipcMain.on("connect", () => {
-  console.log("trying to connect");
-  win.webContents.send("connect-status", "connected");
-})
+  if (proc !== null) return;
+
+  proc = runProcess("find", ["/"]);
+
+  proc.done.then(({code, signal}) => {
+    console.log("process finished, code: ", code, "signal: ", signal);
+  }).catch(err => {
+    console.error("process error: ", err);
+  }).finally(() => {
+    win.webContents.send("connect-proc-finish");
+    proc = null;
+  })
+
+  proc.stdout.on("data", d => {
+    win.webContents.send("connect-status", d.toString());
+  })
+
+  proc.stderr.on("data", d => {
+    win.webContents.send("connect-status", d.toString());
+  })
+});
+
+ipcMain.on("disconnect", () => {
+  if (proc === null) return;
+
+  proc.terminate();
+  proc = null;
+});

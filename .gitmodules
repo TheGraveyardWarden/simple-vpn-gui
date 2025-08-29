@@ -1,0 +1,3 @@
+[submodule "simple-vpn"]
+	path = simple-vpn
+	url = https://github.com/thegraveyardwarden/simple-vpn
